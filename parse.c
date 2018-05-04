@@ -41,6 +41,54 @@ $--RMC,hhmmss,A,llll.ll,a,yyyyy.yy,a,x.x,x.x,xxxx,x.x,a*hh
 12) Checksum
 */
 
+#include <stdio.h>
+#include <string.h>
+
+#include "parse.h"
+
+
 int main(int argc, char **argv) {
-  return 0;
+	nmea_error_t error = NMEA_SUCCESS;
+	nmea_rmc_s   rmc;
+
+	/* NMEA spec says 80 chars plus line terminators. Give it a bit
+	 * more and we'll be able to flag lines that are too long
+	 */
+	char sentence[SENTENCE_RMC_LEN_MAX + 10];
+
+	/* Set the last char to 0, fgets below will only fill up to n-1
+	 * so our sentence will always be null terminated even if the input
+	 * string is longer
+	 */
+	sentence[sizeof(sentence) - 1] = '\0';
+
+	while(fgets(sentence, sizeof(sentence), stdin) != NULL)
+	{
+		/* Strip the CR and/or LF from the sentence */
+		/* TODO - check for \r as well */
+		if(strlen(sentence) > 0)
+		{
+			if(sentence[strlen(sentence) - 1] == '\n')
+			{
+				sentence[strlen(sentence) - 1] = '\0';
+			}
+		}
+
+//		printf("%s\n", sentence);
+
+		error = nmea_process_sentence_rmc(sentence, &rmc, 1);
+
+		if(NMEA_SUCCESS != error)
+		{
+			fprintf(stderr, "Error %d processing: %s\n", error, sentence);
+		}
+		else
+		{
+			nmea_print_result(&rmc);
+		}
+
+//		printf("\n");
+	}
+
+	return 0;
 }

@@ -1,11 +1,11 @@
-parse: parse.c
-	gcc -o parse -Wall parse.c
+parse: parse.c nmea_parse.c
+	gcc -o parse -Wall parse.c nmea_parse.c
 
-parse2: parse2.c
-	gcc -o parse2 -Wall parse2.c
+parse2: parse2.c nmea_parse.c
+	gcc -o parse2 -Wall parse2.c nmea_parse.c
 
-unittest: unittest.c
-	gcc -o unittest -Wall unittest.c
+unittest: unittest.c nmea_parse.c
+	gcc -o unittest -Wall unittest.c nmea_parse.c
 
 all: parse parse2 unittest
 
